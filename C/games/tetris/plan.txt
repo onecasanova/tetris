@@ -10,5 +10,53 @@
   8. Polish (preview next piece, levels, speed increase)
   
 
+detailed plan from claude
+
+1. Display/Rendering
+
+  - Terminal-based (simplest): ncurses library for drawing characters to specific screen positions
+  - Graphical: SDL2 or raylib for window creation, drawing rectangles, and handling frame timing
+  - You need a way to clear the screen and redraw the board each frame
+
+  2. Data Structures
+
+  - Board/grid: A 2D array (e.g., int board[20][10]) representing occupied cells
+  - Tetrominoes: Define the 7 piece shapes as 4x4 or small arrays, plus their rotation states (either
+  store all 4 rotations or compute them)
+  - Current piece state: position (row, col), type, rotation index
+
+  3. Game Loop
+
+  - A while loop that runs continuously:
+    a. Handle input (move left/right, rotate, drop)
+    b. Update state (gravity drops piece every N milliseconds)
+    c. Render the board + current piece
+  - You'll need non-blocking input (ncurses nodelay() or SDL event polling)
+  - Timing: clock(), gettimeofday(), or SDL timers to control drop speed
+
+  4. Core Game Logic
+
+  - Collision detection: Before moving/rotating a piece, check if the new position overlaps the board
+  edges or filled cells
+  - Piece locking: When a piece can't move down, write it into the board array
+  - Line clearing: Scan rows, remove full ones, shift everything above down
+  - Spawning: Place a new random piece at the top; if it collides immediately, game over
+
+  5. Key C Concepts You'll Use
+
+  - 2D arrays and array indexing
+  - struct (for piece state, game state)
+  - enum (for piece types, game states)
+  - switch/control flow
+  - Random number generation (rand(), srand())
+  - Basic pointer usage
+
+  6. Rotation
+
+  - Simple approach: Store all 4 rotation matrices for each piece
+  - Computed approach: Transpose + reverse rows of the piece matrix
+  - Optional: SRS (Super Rotation System) with wall kicks for polished feel
   
+  
+    
   

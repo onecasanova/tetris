@@ -11,8 +11,8 @@ tetris game
 
 
 //define board dimensions
-#define ROWS 20
-#define COLS 10
+#define ROWS 24
+#define COLS 12
 
 
 //2D array of integers to represent the board data

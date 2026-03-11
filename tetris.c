@@ -30,7 +30,7 @@ void draw_board() {
     for (int c = 0; c < COLS; c++){
         mvprintw(0, 1 + c*2, "--"); //double because tetris blocks will be [] (two characters)
     }
-    mvprintw(0, 1 + COLS, "+"); //top right corner
+    mvprintw(0, 1 + COLS*2, "+"); //top right corner
 
 
     //rows, so the middle part
@@ -60,7 +60,7 @@ void draw_board() {
     for (int c = 0; c < COLS; c++){
         mvprintw(ROWS + 1, 1 + c*2, "--"); //double because tetris blocks will be [] (two characters)
     }
-    mvprintw(ROWS + 1, 1 + COLS, "+"); //bottom right corner
+    mvprintw(ROWS + 1, 1 + COLS*2, "+"); //bottom right corner
 
 
 }

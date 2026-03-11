@@ -20,8 +20,19 @@ int board[ROWS][COLS]; //all values start at zero automatically for a newly crea
 
 
 void draw_board() {
+    /*
+    board will be a box so I'll define it in 3 parts: top, middle, and bottom
+    */
+    //top "+-----...-----+"
+    mvprintw(0, 0, "+"); //top left
+    //loop over the COL values and print "--"
+    for (int c = 0; c < COLS; c++){
+        mvprintw(0, 1 + c*2, "--"); //double because tetris blocks will be [] (two characters)
+    }
+    mvprintw(0, 1 + COLS, "+"0); //top right corner
 
-    
+
+
 }
 
 

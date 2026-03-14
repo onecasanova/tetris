@@ -13,10 +13,69 @@ tetris game
 //define board dimensions
 #define ROWS 24
 #define COLS 12
-
+#define PCS 7
 
 //2D array of integers to represent the board data
 int board[ROWS][COLS]; //all values start at zero automatically for a newly created array. the rows and cols just speciy dimensions
+
+//3D array for pieces
+int shapes[PCS][4][4] = {
+    //square
+    {
+    {0, 0, 0, 0},
+    {0, 1, 1, 0},
+    {0, 1, 1, 0},
+    {0, 0, 0, 0}},
+
+    //T piece
+    {
+    {0, 0, 0, 0},
+    {0, 1, 0, 0},
+    {1, 1, 1, 0},
+    {0, 0, 0, 0}
+    },
+
+    //I piece
+    {
+    {0, 1, 0, 0},
+    {0, 1, 0, 0},
+    {0, 1, 0, 0},
+    {0, 1, 0, 0}
+    },
+
+    //S piece
+    {
+    {0, 0, 0, 0},
+    {0, 1, 1, 0},
+    {1, 1, 0, 0},
+    {0, 0, 0, 0}
+    },
+
+    //Z piece
+    {
+    {0, 0, 0, 0},
+    {1, 1, 0, 0},
+    {0, 1, 1, 0},
+    {0, 0, 0, 0}
+    },
+
+    //L piece
+    {
+    {0, 1, 0, 0},
+    {0, 1, 0, 0},
+    {0, 1, 1, 0},
+    {0, 0, 0, 0}
+    },
+
+    //J piece
+    {
+    {0, 1, 0, 0},
+    {0, 1, 0, 0},
+    {1, 1, 0, 0},
+    {0, 0, 0, 0}
+    },
+
+};
 
 
 void draw_board() {
@@ -51,7 +110,7 @@ void draw_board() {
 
     //bottom border, similar to top
     /*
-    Note: use "ROWS + 1" because the game spave will use up to ROWS max value so the bottom border should right outside
+    Note: use "ROWS + 1" because the game space will use up to ROWS max value so the bottom border should right outside
     of that at ROWS + 1.    
     */
 

@@ -152,6 +152,32 @@ void draw_board() {
 
 }
 
+//function to detect collisions
+int collision(int p_row, int p_col, int type) {
+    //p_row is proposed row
+    //p_col is proposed column
+
+    //loop through 4x4 piece grid
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 4; j++){
+            if (shapes[type][i][j] == 1) { //if filled
+                //collision conditions, return 1 if any are true
+                if (p_row + i < 0 || p_row + i > ROWS - 1) {
+                    return 1;
+                }
+                else if (p_col + j < 0 || p_col + j > COLS -1) {
+                    return 1;
+                }
+                //check if board is already occupied
+                else if (board[p_row + i][p_col + j]) {
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 
 int main() {
     initscr(); //initialize ncurses to take ove terminal
@@ -177,12 +203,8 @@ int main() {
         double elapsed = (double)(now - last_drop_t) / CLOCKS_PER_SEC; //put (double) to divide with floating point precision, add CLOCKS_PER_SEC to convert the delta_t to seconds
         if (elapsed > G_TIME) {
             //I piece is length 4
-            if (current.type == 2) {
-                current.row += (current.row < ROWS - 4) ? 1 : 0; //move down
-            }
-            //all the other pieces are length 3
-            else {
-                current.row += (current.row < ROWS - 3) ? 1 : 0; //move down
+            if (!collision(current.row + 1, current.col, current.type)) {
+                current.row += 1;
             }
 
             last_drop_t = now; //update time
@@ -196,35 +218,27 @@ int main() {
         switch (ch) {
             case KEY_LEFT:
                 //move piece left
-                current.col -= (current.col > 0) ? 1 : 0; //use terinary operateor "condition ? expression_if_true : expression_if_false;"
+                if (!collision(current.row, current.col - 1, current.type)) {
+                    current.col -= 1;
+                }
                 break;
             case KEY_RIGHT:
                 //for pieces with width = 2
-                if (current.type == 0 || current.type == 5 || current.type == 6){
-                    current.col += (current.col < (COLS - 2)) ? 1 : 0;
+                if (!collision(current.row, current.col + 1, current.type)) {
+                    current.col += 1;
                 }
-                //I piece
-                else if (current.type == 2){
-                    current.col += (current.col < (COLS - 1)) ? 1 : 0;
-                }
-                //pieces with width = 3
-                else {
-                    current.col += (current.col < (COLS - 3)) ? 1 : 0;
-                }
-                
                 break;
             case KEY_UP:
-                current.row -= (current.row > 0) ? 1 : 0; 
+                if (!collision(current.row - 1, current.col, current.type)) {
+                    current.row -= 1;
+                } 
                 break;
             case KEY_DOWN:
-                if (current.type == 2) { //the I shape
-                    current.row += (current.row < ROWS - 4) ? 1 : 0;
-                }
-                else { //all other shapes are length 3
-                    current.row += (current.row < ROWS - 3) ? 1 : 0;
+                if (!collision(current.row + 1, current.col, current.type)) {
+                    current.row += 1;
                 }
                 break;
-
+                
             //quit
             case 'q':
                 endwin(); //shuts down ncurses, returns terminal back to normal

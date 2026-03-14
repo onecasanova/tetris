@@ -23,8 +23,8 @@ int shapes[PCS][4][4] = {
     //square
     {
     {0, 0, 0, 0},
-    {0, 1, 1, 0},
-    {0, 1, 1, 0},
+    {1, 1, 0, 0},
+    {1, 1, 0, 0},
     {0, 0, 0, 0}},
 
     //T piece
@@ -37,10 +37,10 @@ int shapes[PCS][4][4] = {
 
     //I piece
     {
-    {0, 1, 0, 0},
-    {0, 1, 0, 0},
-    {0, 1, 0, 0},
-    {0, 1, 0, 0}
+    {1, 0, 0, 0},
+    {1, 0, 0, 0},
+    {1, 0, 0, 0},
+    {1, 0, 0, 0}
     },
 
     //S piece
@@ -61,9 +61,9 @@ int shapes[PCS][4][4] = {
 
     //L piece
     {
-    {0, 1, 0, 0},
-    {0, 1, 0, 0},
-    {0, 1, 1, 0},
+    {1, 0, 0, 0},
+    {1, 0, 0, 0},
+    {1, 1, 0, 0},
     {0, 0, 0, 0}
     },
 
@@ -77,6 +77,31 @@ int shapes[PCS][4][4] = {
 
 };
 
+//struct for piece information
+struct Piece {
+    int type;
+    int row;
+    int col;
+    int rot;
+};
+
+//define global struct, so functions can access this current falling piece
+struct Piece current;
+
+
+void draw_piece(){
+
+    //loop through 4x4 shape array
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 4; j++){
+            //if shape array val is 1
+            if (shapes[current.type][i][j]){
+                mvprintw(current.row + i + 1, (current.col + j)*2 + 1, "[]");
+            }
+        }
+    }
+
+}
 
 void draw_board() {
     /*
@@ -129,19 +154,66 @@ int main() {
     initscr(); //initialize ncurses to take ove terminal
     noecho(); //stops typed keys from appearing on screen
     curs_set(0); //removes blinking cursor
+    keypad(stdscr, TRUE); //enable arrow key detection
+    nodelay(stdscr, TRUE); //makes getch() non-blocking so it deosn't stop the program when waiting for a key press
 
-    draw_board(); //draw the board
-    
+
+    //define piece
+    current.type = 2;
+    current.row = 0;
+    current.col = 0;
+
+    //game loop
+    while (true) {
+        
+        //check for keyboard input
+        int ch = getch();
+
+        //update piece position after input
+        switch (ch) {
+            case KEY_LEFT:
+                //move piece left
+                current.col -= (current.col - 1 >= 0) ? 1 : 0; //use terinary operateor "condition ? expression_if_true : expression_if_false;"
+                break;
+            case KEY_RIGHT:
+                //for pieces with width = 2
+                if (current.type == 0 || current.type == 5 || current.type == 6){
+                    current.col += (current.col < (COLS - 2)) ? 1 : 0;
+                }
+                //I piece
+                else if (current.type == 2){
+                    current.col += (current.col < (COLS - 1)) ? 1 : 0;
+                }
+                //pieces with width = 3
+                else {
+                    current.col += (current.col < (COLS - 3)) ? 1 : 0;
+                }
+                
+                break;
+            case KEY_UP:
+                current.row -= 1; 
+                break;
+            case KEY_DOWN:
+                current.row += 1;
+                break;
+
+            //quit
+            case 'q':
+                endwin(); //shuts down ncurses, returns terminal back to normal
+                return 0;
+
+        }
+
+        //redraw board and piece
+        draw_board();
+        draw_piece();
+
     //print everything all at once on the terminal. ncurses puts all the stuff we defined in
     //draw_board() in a buffer in memory, and refresh() sends it all to the terminal at once.
     refresh();
 
-    //waits for any key to be pressed. It's a waiting function, otherwise 
-    //the program would immediately draw the board and exit before I could see it.
-    getch(); 
-    endwin();  //shuts down ncurses, returns terminal back to normal
+    }
 
-    return 0;
 }
 
 

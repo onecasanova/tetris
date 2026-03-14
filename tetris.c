@@ -8,15 +8,18 @@ tetris game
 
 #include <ncurses.h> //drawing to the terminal
 #include <stdlib.h> //general utilities
+#include <time.h> //time library
 
 
 //define board dimensions
 #define ROWS 24
 #define COLS 12
 #define PCS 7
+#define G_TIME 0.5 //seconds
 
 //2D array of integers to represent the board data
 int board[ROWS][COLS]; //all values start at zero automatically for a newly created array. the rows and cols just speciy dimensions
+
 
 //3D array for pieces
 int shapes[PCS][4][4] = {
@@ -159,13 +162,33 @@ int main() {
 
 
     //define piece
-    current.type = 2;
+    current.type = 1;
     current.row = 0;
     current.col = 0;
 
     //game loop
+
+    clock_t last_drop_t = clock(); //get initial clock time before loop
+
     while (true) {
-        
+
+        //Gravity
+        clock_t now = clock(); //get time right now
+        double elapsed = (double)(now - last_drop_t) / CLOCKS_PER_SEC; //put (double) to divide with floating point precision, add CLOCKS_PER_SEC to convert the delta_t to seconds
+        if (elapsed > G_TIME) {
+            //I piece is length 4
+            if (current.type == 2) {
+                current.row += (current.row < ROWS - 4) ? 1 : 0; //move down
+            }
+            //all the other pieces are length 3
+            else {
+                current.row += (current.row < ROWS - 3) ? 1 : 0; //move down
+            }
+
+            last_drop_t = now; //update time
+        }
+
+
         //check for keyboard input
         int ch = getch();
 
@@ -173,7 +196,7 @@ int main() {
         switch (ch) {
             case KEY_LEFT:
                 //move piece left
-                current.col -= (current.col - 1 >= 0) ? 1 : 0; //use terinary operateor "condition ? expression_if_true : expression_if_false;"
+                current.col -= (current.col > 0) ? 1 : 0; //use terinary operateor "condition ? expression_if_true : expression_if_false;"
                 break;
             case KEY_RIGHT:
                 //for pieces with width = 2
@@ -191,10 +214,15 @@ int main() {
                 
                 break;
             case KEY_UP:
-                current.row -= 1; 
+                current.row -= (current.row > 0) ? 1 : 0; 
                 break;
             case KEY_DOWN:
-                current.row += 1;
+                if (current.type == 2) { //the I shape
+                    current.row += (current.row < ROWS - 4) ? 1 : 0;
+                }
+                else { //all other shapes are length 3
+                    current.row += (current.row < ROWS - 3) ? 1 : 0;
+                }
                 break;
 
             //quit

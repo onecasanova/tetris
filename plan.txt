@@ -1,9 +1,9 @@
  Suggested Build Order
 
-  1. Draw a static board in the terminal
-  2. Draw a single piece, move it with keyboard input
-  3. Add gravity (piece falls over time)
-  4. Add collision detection with walls and floor
+  1. Draw a static board in the terminal (DONE)
+  2. Draw a single piece, move it with keyboard input (DONE)
+  3. Add gravity (piece falls over time) (DONE)
+  4. Add collision detection with walls and floor (DONE)
   5. Lock pieces and spawn new ones
   6. Line clearing
   7. Scoring and game over

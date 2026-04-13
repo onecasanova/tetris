@@ -178,6 +178,110 @@ int collision(int p_row, int p_col, int type) {
     return 0;
 }
 
+void lock_piece(){
+    //loop through 4x4 shape array. Very similar to draw peice, but we write to the board permanently now.
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 4; j++){
+            //if shape array val is 1
+            if (shapes[current.type][i][j]){
+                board[current.row + i][current.col + j] = 1;
+            }
+        }
+    }
+}
+
+void spawn_piece() {
+    
+    current.type = (rand() % PCS);
+    // current.type = 2;
+    current.row = 0;
+    current.col = COLS/2 - 2;
+
+}
+
+void line_clear() {
+    //loop through rows, find a full one
+    for (int r = ROWS-1; r >=  0; r--) { //start from bottom rows
+        int k = 1; //bool to detect full row
+        for (int c = 0; c < COLS; c++) {
+            //if the value at board[r][c] is non-zero, then do nothing, otherwise 
+            if (!board[r][c]) {
+                k = 0;
+                break;
+            }
+        }
+
+        //if full then shift rows and clear top one
+        if (k) {
+            for (int rr = r; rr > 0; rr--) {
+                for (int c = 0; c < COLS; c++) {
+                    board[rr][c] = board[rr-1][c];
+                    }
+                }
+                //clear top row
+                for (int c = 0; c < COLS; c++) {
+                    board[0][c] = 0;
+                }
+            r++; //re-check new "current" row on next iteration
+        }
+    }
+}
+
+void transpose() {
+    for (int i = 0; i < 4; i++) {
+        for (int j = i + 1; j < 4; j++) {
+            int temp = shapes[current.type][i][j];
+            shapes[current.type][i][j] = shapes[current.type][j][i];
+            shapes[current.type][j][i] = temp;
+        }
+    }
+}
+
+
+void reverse_r() {
+    //copy array
+    int temp[4][4];
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            temp[i][j] = shapes[current.type][i][j];
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            shapes[current.type][i][j] = temp[3-i][j];
+        }
+    }
+}
+
+void reverse_c() {
+    //copy array
+    int temp[4][4];
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            temp[i][j] = shapes[current.type][i][j];
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            shapes[current.type][i][j] = temp[i][3-j];
+        }
+    }
+}
+
+void rotate_cclock() {
+    //rotate a piece clockwise
+    transpose();
+    reverse_r();
+}
+
+void rotate_clock() {
+    //rotate a piece counter clockwise
+    reverse_r();
+    transpose();
+}
+
 
 int main() {
     initscr(); //initialize ncurses to take ove terminal
@@ -186,9 +290,11 @@ int main() {
     keypad(stdscr, TRUE); //enable arrow key detection
     nodelay(stdscr, TRUE); //makes getch() non-blocking so it deosn't stop the program when waiting for a key press
 
+    //random seed
+    srand(time(NULL));
 
     //define piece
-    current.type = 1;
+    current.type = rand() % 7;
     current.row = 0;
     current.col = 0;
 
@@ -198,6 +304,8 @@ int main() {
 
     while (true) {
 
+        
+            
         //Gravity
         clock_t now = clock(); //get time right now
         double elapsed = (double)(now - last_drop_t) / CLOCKS_PER_SEC; //put (double) to divide with floating point precision, add CLOCKS_PER_SEC to convert the delta_t to seconds
@@ -206,6 +314,13 @@ int main() {
             if (!collision(current.row + 1, current.col, current.type)) {
                 current.row += 1;
             }
+
+            else {
+                lock_piece();
+                line_clear();
+                spawn_piece();
+            }
+
 
             last_drop_t = now; //update time
         }
@@ -228,17 +343,26 @@ int main() {
                     current.col += 1;
                 }
                 break;
+
+            //this key up and down will be removed for the real game.
             case KEY_UP:
                 if (!collision(current.row - 1, current.col, current.type)) {
-                    current.row -= 1;
+                    // current.row -= 1;
+                    rotate_clock();
                 } 
                 break;
             case KEY_DOWN:
                 if (!collision(current.row + 1, current.col, current.type)) {
+                    // current.row += 1;
+                    rotate_cclock();
+                }
+                break;
+            case ' ':
+                if (!collision(current.row + 1, current.col, current.type)) {
+                    // current.row += 1;
                     current.row += 1;
                 }
                 break;
-                
             //quit
             case 'q':
                 endwin(); //shuts down ncurses, returns terminal back to normal

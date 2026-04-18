@@ -85,7 +85,6 @@ struct Piece {
     int type;
     int row;
     int col;
-    int rot;
 };
 
 //define global struct, so functions can access this current falling piece

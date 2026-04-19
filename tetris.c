@@ -321,6 +321,8 @@ void game_over() {
     mvprintw(max_y / 2 + 3, (max_x - 26) / 2, "Press any key to exit...");
 
     refresh(); // Push changes to the actual terminal
+    nodelay(stdscr, FALSE); //makes getch() blocking again
+
     getch();   // Wait for user input before closing
 }
 

@@ -35,5 +35,5 @@ Single-file C program (`tetris.c`) using ncurses for terminal rendering.
 ## Known Issues / Notes
 
 - Rotation mutates `shapes[]` globally, so a piece that has been rotated changes its stored shape permanently. This works for single-player but is worth understanding.
-- `current.rot` field exists in the struct but is unused — rotation state is implicit in the mutated shape data.
+- `current.rot` field was removed — rotation state is implicit in the mutated shape data, so tracking it separately isn't meaningful with this design.
 - Up/Down arrow keys currently rotate (not move up/down); spacebar soft-drops one row.

@@ -17,6 +17,9 @@ tetris game
 #define PCS 7
 #define G_TIME 0.5 //seconds
 
+//score
+int score = 0;
+
 //2D array of integers to represent the board data
 int board[ROWS][COLS]; //all values start at zero automatically for a newly created array. the rows and cols just speciy dimensions
 
@@ -117,6 +120,9 @@ void draw_board() {
         mvprintw(0, 1 + c*2, "--"); //double because tetris blocks will be [] (two characters)
     }
     mvprintw(0, 1 + COLS*2, "+"); //top right corner
+    
+    //display score
+    mvprintw(0, 4 + COLS*2, "score: %d", score);
 
 
     //rows, so the middle part
@@ -190,7 +196,7 @@ void lock_piece(){
 }
 
 void spawn_piece() {
-    
+
     current.type = (rand() % PCS);
     // current.type = 2;
     current.row = 0;
@@ -200,6 +206,7 @@ void spawn_piece() {
 
 void line_clear() {
     //loop through rows, find a full one
+    int n = 0;
     for (int r = ROWS-1; r >=  0; r--) { //start from bottom rows
         int k = 1; //bool to detect full row
         for (int c = 0; c < COLS; c++) {
@@ -221,8 +228,28 @@ void line_clear() {
                 for (int c = 0; c < COLS; c++) {
                     board[0][c] = 0;
                 }
+            n +=1;
             r++; //re-check new "current" row on next iteration
         }
+    }
+
+    //add score based on how many lines cleared
+    switch (n) {
+        case 0: 
+            score += 0;
+            break;
+        case 1:
+            score += 100;
+            break;
+        case 2:
+            score += 300;
+            break;
+        case 3:
+            score += 500;
+            break;
+        case 4:
+            score += 800;
+            break;
     }
 }
 
@@ -281,6 +308,21 @@ void rotate_clock() {
     transpose();
 }
 
+void game_over() {
+    int max_y, max_x;
+    getmaxyx(stdscr, max_y, max_x); // Get terminal dimensions
+
+    clear(); // Clear the current game screen
+
+    // mvprintw(y, x, format, ...)
+    // Centering the text on the screen:
+    mvprintw(max_y / 2, (max_x - 10) / 2, "GAME OVER");
+    mvprintw(max_y / 2 + 1, (max_x - 18) / 2, "Final Score: %d", score);
+    mvprintw(max_y / 2 + 3, (max_x - 26) / 2, "Press any key to exit...");
+
+    refresh(); // Push changes to the actual terminal
+    getch();   // Wait for user input before closing
+}
 
 int main() {
     initscr(); //initialize ncurses to take ove terminal
@@ -318,13 +360,15 @@ int main() {
                 lock_piece();
                 line_clear();
                 spawn_piece();
-            }
-
-
+                if (collision(current.row, current.col, current.type)) {
+                    //print game over screen
+                    game_over();
+                    break;
+                }
+            }   
             last_drop_t = now; //update time
+
         }
-
-
         //check for keyboard input
         int ch = getch();
 
@@ -378,6 +422,7 @@ int main() {
     refresh();
 
     }
+    endwin();
 
 }
 
